@@ -1,0 +1,7 @@
+# Databasuppgifter
+db.url=jdbc:postgresql://localhost:5432/mydb
+db.username=your_username
+db.password=your_password
+
+# API-nycklar
+api.key=YOUR_API_KEY_HERE
