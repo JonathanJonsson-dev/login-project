@@ -1,0 +1,77 @@
+plugins {
+    id 'java'
+    id 'io.quarkus'
+    id 'org.openapi.generator' version '7.9.0'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+    implementation 'io.quarkus:quarkus-arc'  // Dependency Injection
+    implementation 'io.quarkus:quarkus-resteasy-jackson'  // For REST and JSON handling
+
+    // OpenAPI for documentation
+    implementation 'io.quarkus:quarkus-smallrye-openapi'
+
+    // Jakarta Validation API for bean validation
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+
+    // Hibernate Validator for implementing Jakarta Validation
+    implementation 'org.hibernate.validator:hibernate-validator:6.2.3.Final'
+
+    // Testing dependencies
+    testImplementation 'io.quarkus:quarkus-junit5'  // JUnit 5 testing with Quarkus
+    testImplementation 'io.rest-assured:rest-assured'  // REST API testing
+
+    // Mockito dependencies for mocking
+    testImplementation 'org.mockito:mockito-core:4.11.0'
+
+    // This is the missing dependency for using @InjectMock
+    testImplementation 'io.quarkus:quarkus-junit5-mockito'
+}
+
+group 'com.example'
+version '1.0.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+test {
+    systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+}
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+openApiGenerate {
+    generatorName = "jaxrs-spec" // Välj rätt generator (för Quarkus kan du använda jaxrs-spec)
+    inputSpec = "$rootDir/src/main/resources/openapi.yaml" // Ange sökvägen till din OpenAPI YAML-fil
+    outputDir = "$buildDir/generated" // Ange utdata-katalogen för genererad kod
+    apiPackage = "com.example.api" // Paket där API-klasser ska genereras
+    modelPackage = "com.example.model" // Paket där modellklasser ska genereras
+    invokerPackage = "com.example.invoker" // Paket där invokerklasser ska genereras
+    configOptions = [
+            dateLibrary: "java8", // Välj hur datumbibliotek ska hanteras
+            interfaceOnly: "true", // Endast gränssnitt genereras om detta sätts till true
+            useBeanValidation: "true" // Använd Bean Validation API för validering
+    ]
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs "$buildDir/generated/src/main/java"
+        }
+    }
+}
