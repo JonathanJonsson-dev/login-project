@@ -73,7 +73,7 @@ class LoginResourceTest {
                 .then()
                 .statusCode(200)
                 .extract().path("token");  // Extrahera token från JSON-svaret
-
+        Mockito.when(loginService.verifyToken(token)).thenReturn(true);
         // 2. Använd token som Authorization header för att testa /requestaccess
         given()
                 .header("Authorization", "Bearer " + token)  // Skicka token i Authorization-header
@@ -94,7 +94,7 @@ class LoginResourceTest {
                 .header("Authorization", "Bearer " + invalidToken)  // Skicka ogiltig token i Authorization-header
                 .when().get("api/requestaccess")
                 .then()
-                .statusCode(403)
-                .body("message", is("Access denied"));  // Kontrollera att access nekas
+                .statusCode(401)
+                .body("message", is("Invalid token"));  // Kontrollera att access nekas
     }
 }
